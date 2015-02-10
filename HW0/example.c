@@ -34,6 +34,9 @@
  |
  +===========================================================================*/
 
+
+ // test para a Loris ver
+
 #include <stdio.h>
 
 void display(int, char **);
