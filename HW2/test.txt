@@ -1,0 +1,10 @@
+String Test:
+
+"ls -a -b | wc -d"
+
+"ls -a -b | wc -d >> file"
+
+"ls -a -b | wc -d > file"
+
+"ls -a -b > file"
+"ls -a -b >> file"
