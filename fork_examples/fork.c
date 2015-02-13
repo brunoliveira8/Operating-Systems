@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdlib.h> // without it exit will generate a warning
+#include <unistd.h> // without it getpid()and getppid() will generate a warning
   
 int main (void) {
    pid_t pid;
