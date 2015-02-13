@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
 void unix_error(char *msg) /* unix-style error */
 {
     fprintf(stderr, "%s: %s\n", msg, strerror(errno));
@@ -22,8 +23,12 @@ int main()
 {
     int x = 1;
 
-    if (Fork() == 0)
+    if (Fork() == 0){
+
+       printf("Child:\n");
 	   printf("printf1: x=%d\n", ++x);
+
+    } else printf("Parent:\n");
     printf("printf2: x=%d\n", --x);
     exit(0);
 }
