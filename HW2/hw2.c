@@ -41,13 +41,6 @@
  #define BUFSIZE 1024
  #define CSTRSIZE 100
 
-void display(int, char **);
-
-char* getInput(char *argument[]){
-
-	return argument[1];
-
-}	
 
 int hasPipe(char *line){
 
@@ -129,7 +122,7 @@ void getCommand(char *input, char **cmd){
 			if(space != NULL){
 
 				*space = '\0';
-				
+
 				cmd[i] = input_copy;
 
 				if(strlen(cmd[i]) == 0) i--; //this line avoid to create cmd with size 0 that happens when a user type additional spaces.
@@ -490,67 +483,87 @@ void test(char *line, char** cmd1, int i){
 
 int main(int argc, char *argv[])
 {	
-	char *line = getInput(argv);
+	char line[CSTRSIZE];
 	char *cmd1[CMDSIZE];
 	char *cmd2[CMDSIZE];
 	char infile[CSTRSIZE];
 	char outfile[CSTRSIZE];
+	int i = 0;
+	int d;
 
 	cmd1[0]=NULL;
     cmd2[0]=NULL;
 
-	int d = parse_command(line, cmd1, cmd2, infile, outfile);
+    printf("Hello, World!\n");
+		printf("The value of argc (number of command line arguments) is %d\n", argc);
 
-	printf("Return: %d.\n", d );
+    if(argc == 2){
 
-	printf("Hello, World!\n");
-	printf("The value of argc (number of command line arguments) is %d\n", argc);
+    	
 
-	int i = 0;
+	    d = parse_command(argv[1], cmd1, cmd2, infile, outfile);
 
-	while(cmd1[i] != NULL){
+		printf("Return: %d.\n", d );
 
-		printf("cmd1[%d]: %s\n", i, cmd1[i]);
-		i++;
+		while(cmd1[i] != NULL){
+
+			printf("cmd1[%d]: %s\n", i, cmd1[i]);
+			i++;
+		}
+
+	 	i  = 0;
+	 	
+		while(cmd2[i] != NULL){
+
+			printf("cmd2[%d]: %s\n", i, cmd2[i]);
+			i++;
+		}
+
+		if(strlen(infile) != 0 ) printf("Infile: %s\n", infile);
+
+		if(strlen(outfile) != 0 ) printf("Outfile: %s\n", outfile);
+
+		return 1;
 	}
-
- 	i  = 0;
- 	
-	while(cmd2[i] != NULL){
-
-		printf("cmd2[%d]: %s\n", i, cmd2[i]);
-		i++;
-	}
-
-	if(strlen(infile) != 0 ) printf("Infile: %s\n", infile);
-
-	if(strlen(outfile) != 0 ) printf("Outfile: %s\n", outfile);
     
-    //display(argc, argv);
-	//test(line, cmd, 1);
+    else {
+
+    	while(1){
+    		printf("myshell-%% \n");
+    		fgets(line,50,stdin);
+    		//printf("Line: %s\n", line);
+    		d = parse_command(line, cmd1, cmd2, infile, outfile);
+
+    		printf("Size: %lu\n", strlen(line));
+
+    		printf("Return: %d\n", d);
+
+    		while(cmd1[i] != NULL){
+
+			printf("cmd1[%d]: %s\n", i, cmd1[i]);
+			i++;
+			}
+
+		 	i  = 0;
+		 	
+			while(cmd2[i] != NULL){
+
+				printf("cmd2[%d]: %s\n", i, cmd2[i]);
+				i++;
+			}
+
+			if(strlen(infile) != 0 ) printf("Infile: %s\n", infile);
+
+			if(strlen(outfile) != 0 ) printf("Outfile: %s\n", outfile);
+
+   		}
+
+    	return 1;
+    }
 	
 
 
 	return 0;
 }
 
-        /*-----------------------display --------------------------------------
-         |  Function display
-	 |
-	 |  Purpose:  output each c-style string stored in an array.
-	 |
-	 |  Parameters:
-	 |	count (IN) - The number of elements in the array.
-	 |   argument (IN) - The array.
-	 |
-	 |  Returns:  Nothing.  (This is a void function.)
-	 |
-	 *-------------------------------------------------------------------*/
-
-
-void display(int size, char *argument[]){
-    int i;
-    for (i=0; i < size; i++){
-            printf("argv[%d] = %s\n",i,argument[i]);
-    }
-}
+  
