@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
  //CONSTANTS
  #define CMDSIZE 20
@@ -298,7 +299,29 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 	//RETURN 1 - a line without redirection and pipe 
 	if(!hasPipe(line) && !hasRedirection(line)) {
 
+		pid_t pid;
+
 		getCommand(line, cmd1);
+
+		//fork a child process
+		pid = fork();
+
+		if(pid < 0 ) { //error ocurred
+
+			fprintf(stderr, "Fork Failed");
+			return 1;
+		}
+
+		else if(pid == 0){ //child process
+
+			execvp(cmd1[0], cmd1);
+		}
+
+		else { //parent process
+
+			//parent will wait for the child to complete
+			wait(NULL);
+		}
 
 		return 1;
 
@@ -487,7 +510,6 @@ int main(int argc, char *argv[])
 	char infile[CSTRSIZE];
 	char outfile[CSTRSIZE];
 	int i = 0;
-	int d;
 
 	cmd1[0]=NULL;
     cmd2[0]=NULL;
@@ -499,9 +521,7 @@ int main(int argc, char *argv[])
 
     	
 
-	    d = parse_command(argv[1], cmd1, cmd2, infile, outfile);
-
-		printf("Return: %d.\n", d );
+	    parse_command(argv[1], cmd1, cmd2, infile, outfile);
 
 		while(cmd1[i] != NULL){
 
