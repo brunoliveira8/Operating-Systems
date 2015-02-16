@@ -230,8 +230,6 @@ int getOuputRedirection(char *input, char *outfile){
 }
 
 int getOuputOverwrittenRedirection(char *input, char *outfile){
-
-	printf("To aqui\n");
 	
 	char *dec = strstr(input,">");
 
@@ -519,9 +517,9 @@ int main(int argc, char *argv[])
 			i++;
 		}
 
-		if(strlen(infile) != 0 ) printf("Infile: %s\n", infile);
+		if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
 
-		if(strlen(outfile) != 0 ) printf("Outfile: %s\n", outfile);
+		if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
 
 		return 1;
 	}
@@ -529,14 +527,12 @@ int main(int argc, char *argv[])
     else {
 
     	while(1){
-    		printf("myshell-%% \n");
-    		fgets(line,50,stdin);
-    		//printf("Line: %s\n", line);
-    		d = parse_command(line, cmd1, cmd2, infile, outfile);
+    		printf("myshell-%% ");
+    		fgets(line,CSTRSIZE,stdin);
+    		
+    		line[strlen(line)-1] = '\0';
 
-    		printf("Size: %lu\n", strlen(line));
-
-    		printf("Return: %d\n", d);
+    		if(parse_command(line, cmd1, cmd2, infile, outfile) == 0) break;
 
     		while(cmd1[i] != NULL){
 
@@ -552,9 +548,13 @@ int main(int argc, char *argv[])
 				i++;
 			}
 
-			if(strlen(infile) != 0 ) printf("Infile: %s\n", infile);
+			if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
 
-			if(strlen(outfile) != 0 ) printf("Outfile: %s\n", outfile);
+			if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
+
+			//Clean these variables.
+			infile[0] = '\0';
+			outfile[0] = '\0';
 
    		}
 
