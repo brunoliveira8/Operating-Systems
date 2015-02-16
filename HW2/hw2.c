@@ -36,9 +36,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
 
  //CONSTANTS
- #define CMDSIZE 20
+ #define CMDSIZE 30
  #define BUFSIZE 1024
  #define CSTRSIZE 100
 
@@ -70,22 +71,7 @@ int hasRedirection(char *line){
 	return 0;
 }	
 
-//TEST STATUS: OK
-void testHasRedirection(char *line){
 
-	if(hasRedirection(line) == 0) printf("No redirection\n");
-
-	else if(hasRedirection(line) == 1) printf("Input redirection: <\n");
-
-	else if(hasRedirection(line) == 2) printf("Output redirection: >>\n");
-
-	else if(hasRedirection(line) == 3) printf("Output redirection: >\n");
-
-	else printf("Error in hasRedirection()!\n");
-	
-}
-
-//BUG: If the user type "ls -a -b " it will recognize " " as a command.
 void getCommand(char *input, char **cmd){
 
 		int size = strlen(input);
@@ -454,57 +440,11 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 	return 9;
 
 }
-//For some reason, the parse command is executed 2 times
-void testParse_Command(char* line, char** cmd1){
-
-	// RETURN 0 : TEST STATUS = INCOMPLETE : CONDITION TEST = OK : PARSING TEST = OK
-	if(parse_command(line, NULL,NULL,NULL, NULL) == 0) printf("Quit!\n");
-
-	// RETURN 1 : TEST STATUS = INCOMPLETE : CONDITION TEST = OK : PARSING TEST = NOT TEST
-	else if (parse_command(line, cmd1, NULL,NULL, NULL) == 1) printf("No pipe and no redirection!\n");
-
-	// RETURN 2 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 2) printf("No pipe\nInput Redirection: <\n");
-
-	// RETURN 3 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 3) printf("No pipe\nOutput Redirection: >>\n");
-
-	// RETURN 4 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 4) printf("No pipe\nOutput Redirection: >\n");
-
-	// RETURN 5 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 5) printf("Pipe!\nNo Redirection!\n");
-
-	// RETURN 6 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 6) printf("Pipe!\nInput Redirection: <\n");
-
-	// RETURN 7 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 7) printf("Pipe!\nOutput Redirection: >>\n");
-
-	// RETURN 8 : TEST STATUS = INCOMPLETE
-	else if (parse_command(line, NULL,NULL,NULL, NULL) == 8) printf("Pipe!\nOutput Redirection: >\n");
-
-}
-
-void test(char *line, char** cmd1, int i){
-
-	switch(i){
-	    case 0:
-	       testHasRedirection(line);
-	       break; 
-	    case 1:
-	       testParse_Command(line, cmd1);
-	       break;
-	 
-	    //default : 
-	       
-	}
-}
 
 
 int main(int argc, char *argv[])
 {	
-	char line[CSTRSIZE];
+	char line[BUFSIZE];
 	char *cmd1[CMDSIZE];
 	char *cmd2[CMDSIZE];
 	char infile[CSTRSIZE];
@@ -514,8 +454,8 @@ int main(int argc, char *argv[])
 	cmd1[0]=NULL;
     cmd2[0]=NULL;
 
-    printf("Hello, World!\n");
-		printf("The value of argc (number of command line arguments) is %d\n", argc);
+    printf("MyShell 1.0v by Tarcisio Oliveira\n");
+
 
     if(argc == 2){
 
@@ -544,11 +484,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
     
-    else {
+    else if(argc == 1){
 
     	while(1){
     		printf("myshell-%% ");
-    		fgets(line,CSTRSIZE,stdin);
+    		fgets(line,BUFSIZE,stdin);
     		
     		line[strlen(line)-1] = '\0';
 
@@ -581,7 +521,7 @@ int main(int argc, char *argv[])
     	return 1;
     }
 	
-
+	else printf("usage error\n");
 
 	return 0;
 }
