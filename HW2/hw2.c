@@ -37,12 +37,128 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+ #include <sys/wait.h>
 
  //CONSTANTS
  #define CMDSIZE 30
  #define BUFSIZE 1024
  #define CSTRSIZE 100
 
+
+int hasPipe(char *line);
+
+void getCommand(char *line, char **cmd);
+
+int getInputRedirection(char *line, char *infile);
+
+int getOuputRedirection(char *line, char *outfile);
+
+int getOuputOverwrittenRedirection(char *line, char *outfile);
+
+void splitPipeCommand(char *line, char *cmd1, char *cmd2);	
+
+int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outfile);
+
+
+int main(int argc, char *argv[])
+{	
+	char line[BUFSIZE];
+	char *cmd1[CMDSIZE];
+	char *cmd2[CMDSIZE];
+	char infile[CSTRSIZE];
+	char outfile[CSTRSIZE];
+	int i = 0;
+
+	cmd1[0]=NULL;
+    cmd2[0]=NULL;
+
+    infile[0] = '\0';
+	outfile[0] = '\0';
+
+    printf("MyShell 1.0v by Tarcisio Oliveira\n");
+
+
+    if(argc == 2){
+
+    	
+
+	    parse_command(argv[1], cmd1, cmd2, infile, outfile);
+
+		while(cmd1[i] != NULL){
+
+			printf("cmd1[%d]: %s\n", i, cmd1[i]);
+			i++;
+		}
+
+	 	i  = 0;
+	 	
+		while(cmd2[i] != NULL){
+
+			printf("cmd2[%d]: %s\n", i, cmd2[i]);
+			i++;
+		}
+
+		if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
+
+		if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
+
+		return 1;
+	}
+    
+    else if(argc == 1){
+
+    	while(1){
+    		printf("myshell-%% ");
+    		fgets(line,BUFSIZE,stdin);
+    		
+    		line[strlen(line)-1] = '\0';
+
+    		if(parse_command(line, cmd1, cmd2, infile, outfile) == 0) break;
+
+    		while(cmd1[i] != NULL){
+
+			printf("cmd1[%d]: %s\n", i, cmd1[i]);
+			i++;
+			}
+
+		 	i  = 0;
+		 	
+			while(cmd2[i] != NULL){
+
+				printf("cmd2[%d]: %s\n", i, cmd2[i]);
+				i++;
+			}
+
+			if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
+
+			if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
+
+			//Clean these variables.
+			infile[0] = '\0';
+			outfile[0] = '\0';
+
+   		}
+
+    	return 1;
+    }
+	
+	else printf("usage error\n");
+
+	return 0;
+}
+
+/*-----------------------hasPipe--------------------------------------
+     |  Function hasPipe
+	 |
+	 |  Purpose:  Verify if there is a character pipe in the input.
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  
+	 |  Returns:  (0) There is not pipe
+	 |			  (1) There is pipe
+	 |
+	 *-------------------------------------------------------------------*/
 
 int hasPipe(char *line){
 
@@ -52,16 +168,28 @@ int hasPipe(char *line){
 
 }
 
-// 0 - No redirection, 1 - Only Input Redirection, 2 - Output Redirection: >, 3 - Output Redirection: >>
-//NOTE: It is possible has input and ouput, in this case, output will be prefered
+/*-----------------------hasRedirection--------------------------------------
+     |  Function hasRedirection
+	 |
+	 |  Purpose:  Verify if there are some type of redirection characters
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  
+	 |  Returns:  (0) There is not redirection
+	 |			  (1) Input redirection '<'
+	 |			  (2) Output redirection '>>'
+	 |			  (3) Overwritten output redirection '>' 
+	 |
+	 *-------------------------------------------------------------------*/
+
 int hasRedirection(char *line){
 
 	char *red = strstr(line, ">");
 
-	if (strstr(line, "<") != NULL && red == NULL) return 1; //It has only input redirection
+	if (strstr(line, "<") != NULL && red == NULL) return 1; 
 
 	else {
-		//It could be input redirection too
 		if(red != NULL && *(red+1) == '>') return 2;
 		else if(red != NULL && *(red+1) != '>') return 3; 
 		
@@ -71,14 +199,26 @@ int hasRedirection(char *line){
 	return 0;
 }	
 
+ /*-----------------------getCommand --------------------------------------
+         |  Function getCommand
+	 |
+	 |  Purpose:  Getting the command used in the command line.
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  cmd (IN) - Variable that will keep the command typed by the user.
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 
-void getCommand(char *input, char **cmd){
+void getCommand(char *line, char **cmd){
 
-		int size = strlen(input);
+		int size = strlen(line);
 
 		char *input_copy = malloc((size+1)* sizeof (char));
 
-		input_copy = strcpy(input_copy, input);
+		input_copy = strcpy(input_copy, line);
 
 		int i = 0;
 
@@ -126,15 +266,28 @@ void getCommand(char *input, char **cmd){
 
 }
 
-int getInputRedirection(char *input, char *infile){
-	
-	char *dec = strstr(input,"<");
+/*-----------------------getInputRedirection --------------------------------------
+     |  Function getInputRedirection
+	 |
+	 |  Purpose: Getting the input redirection file name.
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  infile (IN) - Variable that will keep the name of the file typed by the user.
+	 |
+	 |  Returns:  1 if there is an input redirection and 0 if there is not.
+	 |
+	 *-------------------------------------------------------------------*/
 
-	int size = strlen(input);
+int getInputRedirection(char *line, char *infile){
+	
+	char *dec = strstr(line,"<");
+
+	int size = strlen(line);
 
 	char *input_copy = malloc((size+1)* sizeof (char));
 
-	input_copy = strcpy(input_copy, input);
+	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
 
@@ -173,15 +326,27 @@ int getInputRedirection(char *input, char *infile){
 
 }
 
-int getOuputRedirection(char *input, char *outfile){
+/*-----------------------getOutputRedirection--------------------------------------
+     |  Function getOutputRedirection
+	 |
+	 |  Purpose:  Getting the output redirection file name.
+	 |		 
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  outfile (IN) - Variable that will keep the name of the file typed by the user.
+	 |
+	 |  Returns:  1 if there is an output redirection and 0 if there is not.
+	 |
+	 *-------------------------------------------------------------------*/
+int getOuputRedirection(char *line, char *outfile){
 	
-	char *dec = strstr(input,">>");
+	char *dec = strstr(line,">>");
 
-	int size = strlen(input);
+	int size = strlen(line);
 
 	char *input_copy = malloc((size+1)* sizeof (char));
 
-	input_copy = strcpy(input_copy, input);
+	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
 
@@ -216,15 +381,27 @@ int getOuputRedirection(char *input, char *outfile){
 
 }
 
-int getOuputOverwrittenRedirection(char *input, char *outfile){
+/*-----------------------getOuputOverwrittenRedirection--------------------------------------
+     |  Function getOuputOverwrittenRedirection
+	 |
+	 |  Purpose:  Getting the overwritten output redirection file name.
+	 |		 
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  outfile (IN) - Variable that will keep the name of the file typed by the user.
+	 |
+	 |  Returns:  1 if there is an output redirection and 0 if there is not.
+	 |
+	 *-------------------------------------------------------------------*/
+int getOuputOverwrittenRedirection(char *line, char *outfile){
 	
-	char *dec = strstr(input,">");
+	char *dec = strstr(line,">");
 
-	int size = strlen(input);
+	int size = strlen(line);
 
 	char *input_copy = malloc((size+1)* sizeof (char));
 
-	input_copy = strcpy(input_copy, input);
+	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
 
@@ -259,23 +436,60 @@ int getOuputOverwrittenRedirection(char *input, char *outfile){
 
 }
 
-void splitPipeCommand(char *input, char *cmd1, char *cmd2){
 
-	char *pipe = strstr(input, "|");
+ /*-----------------------splitPipeCommand--------------------------------------
+     |  Function splitPipeCommand
+	 |
+	 |  Purpose:  Split the string typed by the user in two according to the pipe
+	 |			symbol position.
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  cmd1 (IN) - It keeps the commands before the pipe.
+	 |  cmd2 (IN) - It keeps the commands after the pipe.
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void splitPipeCommand(char *line, char *cmd1, char *cmd2){
+
+	char *pipe = strstr(line, "|");
 	*pipe = '\0';
 	pipe++;
 
 	while(*pipe == ' ') pipe++; //processing the string eliminating the first spaces
 
 	
-	strcpy(cmd1, input);
+	strcpy(cmd1, line);
 	strcpy(cmd2, pipe);
-
 }
 
-
-
-	
+/*-----------------------parse_command--------------------------------------
+     |  Function parse_command
+	 |
+	 |  Purpose:  Processing the string typed by the user.
+	 |
+	 |  Parameters:
+	 |	line (IN) - String typed by the user in the prompt.
+	 |  cmd1 (IN) - It keeps the commands before the pipe.
+	 |  cmd2 (IN) - It keeps the commands after the pipe.
+	 |  infile (IN) - Variable that will keep the name of the file typed by
+	 |				  the user after the input redirection.
+	 |	outfile (IN) - Variable that will keep the name of the file typed by
+	 |				   the user after the output redirection.
+	 |  
+	 |  Returns:  (0) The user typed "quit"
+	 |			  (1) A line without redirection and pipe 
+	 |			  (2) A line with only input redirection, without pipe and output redirection.
+	 |			  (3) A line with output redirection(>>) and without pipe. WARNING: It could be input redirection too.
+	 |			  (4) A line with overwritten output redirection(>) and without pipe. WARNING: It could be input redirection too.
+	 |			  (5) A line with pipe and without redirection.
+	 |			  (6) A line with pipe and only input redirection.
+	 |			  (7) A line with pipe and output redirection(>>). WARNING: It could be input redirection too.
+	 |			  (8) A line with pipe and overwritten output redirection(>). WARNING: It could be input redirection too.
+	 |			  (9) Something else yet to be handled by our program but is handled by the shell perhaps.
+	 |
+	 *-------------------------------------------------------------------*/
 
 int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outfile){
 
@@ -439,91 +653,6 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 	printf("This function was not implement yet. Sorry :(\n");
 	return 9;
 
-}
-
-
-int main(int argc, char *argv[])
-{	
-	char line[BUFSIZE];
-	char *cmd1[CMDSIZE];
-	char *cmd2[CMDSIZE];
-	char infile[CSTRSIZE];
-	char outfile[CSTRSIZE];
-	int i = 0;
-
-	cmd1[0]=NULL;
-    cmd2[0]=NULL;
-
-    printf("MyShell 1.0v by Tarcisio Oliveira\n");
-
-
-    if(argc == 2){
-
-    	
-
-	    parse_command(argv[1], cmd1, cmd2, infile, outfile);
-
-		while(cmd1[i] != NULL){
-
-			printf("cmd1[%d]: %s\n", i, cmd1[i]);
-			i++;
-		}
-
-	 	i  = 0;
-	 	
-		while(cmd2[i] != NULL){
-
-			printf("cmd2[%d]: %s\n", i, cmd2[i]);
-			i++;
-		}
-
-		if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
-
-		if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
-
-		return 1;
-	}
-    
-    else if(argc == 1){
-
-    	while(1){
-    		printf("myshell-%% ");
-    		fgets(line,BUFSIZE,stdin);
-    		
-    		line[strlen(line)-1] = '\0';
-
-    		if(parse_command(line, cmd1, cmd2, infile, outfile) == 0) break;
-
-    		while(cmd1[i] != NULL){
-
-			printf("cmd1[%d]: %s\n", i, cmd1[i]);
-			i++;
-			}
-
-		 	i  = 0;
-		 	
-			while(cmd2[i] != NULL){
-
-				printf("cmd2[%d]: %s\n", i, cmd2[i]);
-				i++;
-			}
-
-			if(strlen(infile) != 0 ) printf("input redirection file name: %s\n", infile);
-
-			if(strlen(outfile) != 0 ) printf("output redirection file name: %s\n", outfile);
-
-			//Clean these variables.
-			infile[0] = '\0';
-			outfile[0] = '\0';
-
-   		}
-
-    	return 1;
-    }
-	
-	else printf("usage error\n");
-
-	return 0;
 }
 
   
