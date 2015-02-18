@@ -49,6 +49,8 @@ int hasPipe(char *line);
 
 void getCommand(char *line, char **cmd);
 
+int hasRedirection(char *line);
+
 int getInputRedirection(char *line, char *infile);
 
 int getOuputRedirection(char *line, char *outfile);
@@ -241,27 +243,28 @@ void getCommand(char *line, char **cmd){
 		aux = strstr(input_copy,"|");
 		if(aux != NULL) *aux = '\0';
 
+		aux = input_copy;
 
 		while(space != NULL || i == 0){
 
-			space = strstr(input_copy, " ");
+			space = strstr(aux, " ");
 
 			if(space != NULL){
 
 				*space = '\0';
 
-				cmd[i] = input_copy;
+				cmd[i] = aux;
 
 				if(strlen(cmd[i]) == 0) i--; //this line avoid to create cmd with size 0 that happens when a user type additional spaces.
 
-				input_copy = space+1;
+				aux = space+1;
 
 			}
 
 			i++;
 
 		}
-		
+		free(input_copy);
 		cmd[i-1] = NULL;
 
 }
