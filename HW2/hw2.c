@@ -243,28 +243,26 @@ void getCommand(char *line, char **cmd){
 		aux = strstr(input_copy,"|");
 		if(aux != NULL) *aux = '\0';
 
-		aux = input_copy;
-
 		while(space != NULL || i == 0){
 
-			space = strstr(aux, " ");
+			space = strstr(input_copy, " ");
 
 			if(space != NULL){
 
 				*space = '\0';
 
-				cmd[i] = aux;
+				cmd[i] = input_copy;
 
 				if(strlen(cmd[i]) == 0) i--; //this line avoid to create cmd with size 0 that happens when a user type additional spaces.
 
-				aux = space+1;
+				input_copy = space+1;
 
 			}
 
 			i++;
 
 		}
-		free(input_copy);
+
 		cmd[i-1] = NULL;
 
 }
@@ -293,6 +291,8 @@ int getInputRedirection(char *line, char *infile){
 	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
+
+	char *aux = input_copy;
 
 	
 
