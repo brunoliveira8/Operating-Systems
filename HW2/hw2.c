@@ -291,10 +291,7 @@ int getInputRedirection(char *line, char *infile){
 	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
-
-	char *aux = input_copy;
-
-	
+		
 
 	if(dec != NULL) {
 
