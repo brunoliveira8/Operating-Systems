@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
- #include <sys/wait.h>
+#include <sys/wait.h>
 
  //CONSTANTS
  #define CMDSIZE 30
@@ -291,7 +291,7 @@ int getInputRedirection(char *line, char *infile){
 	input_copy = strcpy(input_copy, line);
 
 	char *space = NULL;
-		
+
 
 	if(dec != NULL) {
 
