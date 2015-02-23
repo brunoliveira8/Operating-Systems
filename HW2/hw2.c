@@ -514,7 +514,8 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 		else if(pid == 0){ //child process
 
-			execvp(cmd1[0], cmd1);
+			if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+			
 		}
 
 		else { //parent process
