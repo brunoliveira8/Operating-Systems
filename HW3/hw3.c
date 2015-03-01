@@ -722,11 +722,56 @@ void exec_cmd(char** cmd1){
 
 void exec_cmd_in(char** cmd1, char* infile){
 
+	pid_t pid;
+	int fd, fd1;
+
+	//Redirection
+	if ( (fd1 = dup(0)) == -1 ) {
+	        // error
+	};
+
+	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
+	        
+	}
+
+	if ( dup2(fd, 0) == -1) {
+	        //error
+	}
+
+	//fork a child process
+	pid = fork();
+
+	if(pid < 0 ) { //error ocurred
+
+		fprintf(stderr, "Fork Failed");
+
+	}
+
+	else if(pid == 0){ //child process
+
+		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+			
+	}
+
+	else { //parent process
+
+		//parent will wait for the child to complete
+		wait(NULL);
+	}
+
+	// restore, input goes to stdout
+	if ( dup2(fd1, 0) == -1 ){
+	    // error
+	};
+
+	close(fd);
+	close(fd1);
+
 }
 
 void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 	pid_t pid;
-	int fd,fd1;
+	int fd,fd1,fd2,fd3;
 
 	//Redirection
 	if ( (fd1 = dup(1)) == -1 ) {
@@ -741,54 +786,15 @@ void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 	        //error
 	}
 
-	//fork a child process
-	pid = fork();
-
-	if(pid < 0 ) { //error ocurred
-
-		fprintf(stderr, "Fork Failed");
-
-	}
-
-	else if(pid == 0){ //child process
-		
-		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
-			
-	}
-
-	else { //parent process
-
-		//parent will wait for the child to complete
-		wait(NULL);
-	}
-
-	// restore, output goes to stdout
-	if ( dup2(fd1, 1) == -1 ){
-	    // error
-	};
-
-	close(fd);
-	close(fd1);
-
-
-
-}
-
-void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
-
-	pid_t pid;
-	int fd,fd1;
-
-	//Redirection
-	if ( (fd1 = dup(1)) == -1 ) {
+	if ( (fd3 = dup(0)) == -1 ) {
 	        // error
 	};
 
-	if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
+	if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 	        
 	}
 
-	if ( dup2(fd, 1) == -1) {
+	if ( dup2(fd2, 0) == -1) {
 	        //error
 	}
 
@@ -818,8 +824,85 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	    // error
 	};
 
+	// restore, input goes to stdout
+	if ( dup2(fd3, 0) == -1 ){
+	    // error
+	};
+
 	close(fd);
 	close(fd1);
+	close(fd2);
+	close(fd3);
+
+
+
+}
+
+void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
+
+	pid_t pid;
+	int fd,fd1,fd2,fd3;
+
+	//Redirection
+	if ( (fd1 = dup(1)) == -1 ) {
+	        // error
+	};
+
+	if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
+	        
+	}
+
+	if ( dup2(fd, 1) == -1) {
+	        //error
+	}
+	if ( (fd3 = dup(0)) == -1 ) {
+	        // error
+	};
+
+	if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
+	        
+	}
+
+	if ( dup2(fd2, 0) == -1) {
+	        //error
+	}
+
+
+	//fork a child process
+	pid = fork();
+
+	if(pid < 0 ) { //error ocurred
+
+		fprintf(stderr, "Fork Failed");
+
+	}
+
+	else if(pid == 0){ //child process
+		
+		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+			
+	}
+
+	else { //parent process
+
+		//parent will wait for the child to complete
+		wait(NULL);
+	}
+
+	// restore, output goes to stdout
+	if ( dup2(fd1, 1) == -1 ){
+	    // error
+	};
+
+	// restore, input goes to stdout
+	if ( dup2(fd3, 0) == -1 ){
+	    // error
+	};
+
+	close(fd);
+	close(fd1);
+	close(fd2);
+	close(fd3);
 }
 
 void exec_pipe(char** cmd1, char** cmd2){}
