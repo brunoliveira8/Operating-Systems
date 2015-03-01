@@ -65,9 +65,19 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 void exec_cmd(char** cmd1);
 
-void exec_cmd_in(char** cmd1, char* infile)
+void exec_cmd_in(char** cmd1, char* infile);
 
 void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile);
+
+void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile);
+
+void exec_pipe(char** cmd1, char** cmd2);
+
+void exec_pipe_in(char** cmd1, char** cmd2, char* infile);
+
+void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile);
+
+void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile);
 
 
 int main(int argc, char *argv[])
@@ -95,45 +105,41 @@ int main(int argc, char *argv[])
     	parseReturn = parse_command(argv[1], cmd1, cmd2, infile, outfile);
 
     	switch(parseReturn){
-    		case 0:
-       			
-       			break; /* optional */
-    		
+
     		case 1:
-       			
-      			break; /* optional */
+				exec_cmd(cmd1);
+      			break; 
 
     		case 2:
-       			
-      			break; /* optional */
+       			exec_cmd_in(cmd1, infile);
+      			break; 
 
-    		case 2:
-       			
-      			break; /* optional */
+    		case 3:
+       			exec_cmd_opt_in_append(cmd1, infile, outfile);
+      			break; 
 
     		case 4:
-       			
-      			break; /* optional */
+       			exec_cmd_opt_in_write(cmd1, infile, outfile);
+      			break; 
 
     		case 5:
-       			
-      			break; /* optional */
+       			exec_pipe(cmd1, cmd2);
+      			break; 
 
     		case 6:
-       			
-      			break; /* optional */
+       			exec_pipe_in(cmd1, cmd2, infile);
+      			break; 
 
     		case 7:
-       			
-      			break; /* optional */
+       			exec_pipe_opt_in_append(cmd1, cmd2, infile, outfile);
+      			break; 
 
     		case 8:
-       			
-      			break; /* optional */
-  
-    		/* you can have any number of case statements */
-    		default : /* Optional */
-       			//type here
+       			exec_pipe_opt_in_write(cmd1, cmd2, infile, outfile);
+      			break; 
+
+    		default : 
+       			printf("Not handled at this time!");//type here
 		}
 
 		while(cmd1[i] != NULL){
@@ -699,11 +705,29 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 	}
 
-
 	//RETURN 9 - something else yet to be handled by our program but is handled by the shell perhaps.
-	printf("This function was not implement yet. Sorry :(\n");
 	return 9;
 
 }
+
+
+//Execution functions
+
+void exec_cmd(char** cmd1){}
+
+void exec_cmd_in(char** cmd1, char* infile){}
+
+void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){}
+
+void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){}
+
+void exec_pipe(char** cmd1, char** cmd2){}
+
+void exec_pipe_in(char** cmd1, char** cmd2, char* infile){}
+
+void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile){}
+
+void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){}
+
 
   
