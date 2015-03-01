@@ -725,17 +725,26 @@ void exec_cmd_in(char** cmd1, char* infile){
 	pid_t pid;
 	int fd, fd1;
 
-	//Redirection
+	//Input Redirection
+	//Keeps the stdin file descriptor information in fd1
 	if ( (fd1 = dup(0)) == -1 ) {
-	        // error
-	};
+	    
+	    printf("It was not possible to copy the file descriptor\n");
+	    exit(1);
+	}
 
+	//Opens the infile file and hold the file descriptor in fd
 	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
+
+		printf("It was not possible to open the input file.\n");
+		exit(1);
 	        
 	}
 
+	//Makes the stdin descriptor points to infile.
 	if ( dup2(fd, 0) == -1) {
-	        //error
+		printf("It was not possible to copy the file descriptor\n");
+		exit(1);
 	}
 
 	//fork a child process
@@ -744,6 +753,7 @@ void exec_cmd_in(char** cmd1, char* infile){
 	if(pid < 0 ) { //error ocurred
 
 		fprintf(stderr, "Fork Failed");
+		exit(1);
 
 	}
 
@@ -764,6 +774,7 @@ void exec_cmd_in(char** cmd1, char* infile){
 	    // error
 	};
 
+	//close the descriptors
 	close(fd);
 	close(fd1);
 
@@ -773,30 +784,42 @@ void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 	pid_t pid;
 	int fd,fd1,fd2,fd3;
 
-	//Redirection
+	//Output Redirection
+	//Keeps the stdout file descriptor information in fd1
 	if ( (fd1 = dup(1)) == -1 ) {
-	        // error
-	};
+	    printf("It was not possible to copy the file descriptor\n");
+	    exit(1);
+	}
 
+	//Opens the infile file and hold the file descriptor in fd
 	if ( (fd = open(outfile, O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
-	        
+	    printf("It was not possible to open the output file.\n");
+		exit(1);   
 	}
 
+	//Makes the stdout descriptor points to infile.
 	if ( dup2(fd, 1) == -1) {
-	        //error
+	    printf("It was not possible to copy the file descriptor\n");
+		exit(1);
 	}
 
-	if ( (fd3 = dup(0)) == -1 ) {
-	        // error
-	};
+	//Verifies if there is an infile, then repeats the output command but for the input
+	if(infile[0] != '\0'){
+		if ( (fd3 = dup(0)) == -1 ) {
+		    printf("It was not possible to copy the file descriptor\n");
+	    	exit(1);
+		}
 
-	if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
-	        
-	}
+		if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
+			printf("It was not possible to open the input file.\n");
+			exit(1);    
+		}
 
-	if ( dup2(fd2, 0) == -1) {
-	        //error
-	}
+		if ( dup2(fd2, 0) == -1) {
+		    printf("It was not possible to copy the file descriptor\n");
+			exit(1);
+		}
+	 }
 
 	//fork a child process
 	pid = fork();
@@ -829,11 +852,14 @@ void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 	    // error
 	};
 
+	//close the descriptors
 	close(fd);
 	close(fd1);
-	close(fd2);
-	close(fd3);
 
+	if(infile[0] != '\0'){
+		close(fd2);
+		close(fd3);
+	}
 
 
 }
@@ -843,28 +869,42 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	pid_t pid;
 	int fd,fd1,fd2,fd3;
 
-	//Redirection
+	//Redirections
+	//Keeps the stdout file descriptor information in fd1
 	if ( (fd1 = dup(1)) == -1 ) {
-	        // error
+	    printf("It was not possible to copy the file descriptor\n");
+	    exit(1);
 	};
 
+	//Opens the infile file and hold the file descriptor in fd
 	if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
-	        
+		printf("It was not possible to open the output file.\n");
+		exit(1); 
 	}
-
+	
+	//Makes the stdout descriptor points to infile.
 	if ( dup2(fd, 1) == -1) {
-	        //error
-	}
-	if ( (fd3 = dup(0)) == -1 ) {
-	        // error
-	};
-
-	if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
-	        
+	    printf("It was not possible to copy the file descriptor\n");
+		exit(1);
 	}
 
-	if ( dup2(fd2, 0) == -1) {
-	        //error
+
+	//Verifies if there is an infile, then repeats the output command but for the input
+	if(infile[0] != '\0'){
+		if ( (fd3 = dup(0)) == -1 ) {
+		    printf("It was not possible to copy the file descriptor\n");
+	    	exit(1);
+		}
+
+		if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
+			printf("It was not possible to open the input file.\n");
+			exit(1);    
+		}
+
+		if ( dup2(fd2, 0) == -1) {
+		    printf("It was not possible to copy the file descriptor\n");
+			exit(1);
+		}
 	}
 
 
@@ -899,10 +939,14 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	    // error
 	};
 
+	//Close the descriptors
 	close(fd);
 	close(fd1);
-	close(fd2);
-	close(fd3);
+	
+	if(infile[0] != '\0'){
+		close(fd2);
+		close(fd3);
+	}
 }
 
 void exec_pipe(char** cmd1, char** cmd2){}
