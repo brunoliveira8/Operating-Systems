@@ -696,8 +696,6 @@ void exec_cmd(char** cmd1){
 
 	pid_t pid;
 
-	printf("oi\n");
-
 	//fork a child process
 	pid = fork();
 
@@ -949,7 +947,113 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	}
 }
 
-void exec_pipe(char** cmd1, char** cmd2){}
+
+void exec_pipe(char** cmd1, char** cmd2){
+
+	pid_t pid;
+	int pipefd[2]; // return value from the pipe system call
+    int fdw, fdr;
+
+    // making a pipe
+    if ( pipe(pipefd) == -1 ) {
+        printf("It was not possible to create the pipe\n");
+		exit(1);
+    }
+    // pipe[1] is the write end of the pipe
+    // pipe[0] is the read end of the pipe
+
+    // save a copy of stdout in entry fdw
+    // you may want to check the fdw value
+    fdw=dup(STDOUT_FILENO);
+    if (fdw == -1){
+    	printf("It was not possible to copy the file descriptor\n");
+		exit(1);      
+    }
+
+    // changing descriptor table, making write end of pipe as stdout
+    if ( dup2(pipefd[1], STDOUT_FILENO) == -1) {
+        printf("It was not possible to copy the file descriptor\n");
+		exit(1);  
+    }
+
+	//fork a child process
+	pid = fork();
+
+
+	if(pid < 0 ) { //error ocurred
+
+		fprintf(stderr, "Fork Failed");
+
+	}
+
+	else if(pid == 0){ //child process
+
+		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+			
+	}
+
+	else { //parent process
+
+		//parent will wait for the child to complete
+		wait(NULL);
+	}
+
+	// restore stdout from saved values
+    if ( dup2(fdw, STDOUT_FILENO) == -1) {
+        printf("It was not possible to copy the file descriptor\n");
+		exit(1); 
+    }
+
+ 
+	// save a copy of stdin in entry fdr
+    // you may want to check the fdr value
+    fdr=dup(STDIN_FILENO);
+    if (fdr == -1){
+        printf("It was not possible to copy the file descriptor\n");
+		exit(1); 
+    }
+
+    
+    // make read end of pipe as stdin
+    if ( dup2(pipefd[0], STDIN_FILENO ) == -1) {
+        printf("It was not possible to copy the file descriptor\n");
+		exit(1); 
+    }
+
+    //this line is essential, without it, the code still waiting for an input
+	close(pipefd[1]);
+
+	//fork a child process
+	pid = fork();
+
+	if(pid < 0 ) { //error ocurred
+
+		fprintf(stderr, "Fork Failed");
+
+	}
+
+	else if(pid == 0){ //child process
+		if(execvp(cmd2[0], cmd2) == -1 ) exit(1);
+	}
+
+	else { //parent process
+		//parent will wait for the child to complete
+		wait(NULL);
+	}
+
+	// restore stdin and stdout from saved values
+    if ( dup2(fdr, STDIN_FILENO) == -1) {
+        printf("It was not possible to copy the file descriptor\n");
+		exit(1); 
+    }
+
+	// closing up
+    close(fdw);
+    close(fdr);
+    close(pipefd[0]);
+}
+
+
 
 void exec_pipe_in(char** cmd1, char** cmd2, char* infile){}
 
