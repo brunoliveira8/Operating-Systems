@@ -649,9 +649,9 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 		//getInputRedirection(line2, infile);
 
-		getOuputRedirection(line1, outfile);
+		//getOuputRedirection(line1, outfile);
 
-		getOuputRedirection(line2, outfile);
+		if(hasRedirection(line2) == 2) getOuputRedirection(line2, outfile);
 
 
 		return 7;
@@ -675,9 +675,9 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 		//getInputRedirection(line2, infile);
 
-		getOuputOverwrittenRedirection(line1, outfile);
+		//getOuputOverwrittenRedirection(line1, outfile);
 
-		getOuputOverwrittenRedirection(line2, outfile);
+		if(hasRedirection(line2) == 3) getOuputOverwrittenRedirection(line2, outfile);
 
 
 		return 8;
@@ -1188,9 +1188,11 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
     }
 
     //Opens the outfile file and hold the file descriptor in fd
-	if ( (fd = open(outfile, O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
-	    printf("It was not possible to open the output file.\n");
-		exit(1);   
+    if(outfile[0] != '\0'){
+		if ( (fd = open(outfile, O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
+		    printf("It was not possible to open the output file.\n");
+			exit(1);   
+		}
 	}
 
 	//Verifies if there is an infile, then repeats the output command but for the input
@@ -1272,10 +1274,12 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
 	}
 
 	else if(pid == 0){ //child process
-		//Makes the stdout descriptor points to outfile.
-		if ( dup2(fd, 1) == -1) {
-		    printf("It was not possible to copy the file descriptor\n");
-			exit(1);
+		if(outfile[0] != '\0'){
+			//Makes the stdout descriptor points to outfile.
+			if ( dup2(fd, 1) == -1) {
+			    printf("It was not possible to copy the file descriptor\n");
+				exit(1);
+			}
 		}
 		if(execvp(cmd2[0], cmd2) == -1 ) exit(1);
 	}
@@ -1329,9 +1333,11 @@ void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){
     }
 
     //Opens the outfile file and hold the file descriptor in fd
-	if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
-		printf("It was not possible to open the output file.\n");
-		exit(1); 
+	if(outfile[0] != '\0'){
+		if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
+			printf("It was not possible to open the output file.\n");
+			exit(1); 
+		}
 	}
 
 	//Verifies if there is an infile, then repeats the output command but for the input
@@ -1342,10 +1348,6 @@ void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){
 			exit(1);    
 		}
 
-		if ( dup2(fd1, 0) == -1) {
-		    printf("It was not possible to copy the file descriptor\n");
-			exit(1);
-		}
 	 }
 
 	//fork a child process
@@ -1414,9 +1416,11 @@ void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){
 
 	else if(pid == 0){ //child process
 		//Makes the stdout descriptor points to outfile.
-		if ( dup2(fd, 1) == -1) {
-		    printf("It was not possible to copy the file descriptor\n");
-			exit(1);
+		if(outfile[0] != '\0'){
+			if ( dup2(fd, 1) == -1) {
+			    printf("It was not possible to copy the file descriptor\n");
+				exit(1);
+			}
 		}
 		if(execvp(cmd2[0], cmd2) == -1 ) exit(1);
 	}
