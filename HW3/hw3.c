@@ -1109,11 +1109,6 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	//Opens the infile file and hold the file descriptor in fd
 	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 
-		// restore stdout from saved values
-	    if ( dup2(fdw, STDOUT_FILENO) == -1) {
-	        printf("It was not possible to copy the file descriptor\n");
-			exit(1); 
-	    }
 		printf("It was not possible to open the input file.\n");
 		exit(1);
 	        
