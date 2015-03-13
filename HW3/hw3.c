@@ -1,12 +1,12 @@
 /*=============================================================================
- |    File Name:  hw2.c [in which directory on what computer]
+ |    File Name:  hw3.c [in which directory on what computer]
  |
  |       Author:  Tarcisio Bruno Carneiro Oliveira
  |     Language:  ANSI C (tested using gcc on turing [might list version infor])
  |   To Compile:  gcc -Wall hw1.c
  |
  |        Class:  CSCE3613 
- |      Project:  Simple Shell Part II
+ |      Project:  Simple Shell Part III
  |   Assumption:  [any prerequisite or precondition that must be met]
  | Date Created:  1-23-2015
  |     Modified:  2-4-2015
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     infile[0] = '\0';
 	outfile[0] = '\0';
 
-    printf("MyShell 1.0v by Tarcisio Oliveira\n");
+    printf("MyShell 2.0v by Tarcisio Oliveira\n");
 
 
     if(argc == 2){
