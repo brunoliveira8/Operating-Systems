@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
 	cmd1[0]=NULL;
     cmd2[0]=NULL;
-
+    //line[0] = '\0';
     infile[0] = '\0';
 	outfile[0] = '\0';
 
@@ -173,7 +173,48 @@ int main(int argc, char *argv[])
     		
     		line[strlen(line)-1] = '\0';
 
-    		if(parse_command(line, cmd1, cmd2, infile, outfile) == 0) break;
+    		parseReturn = parse_command(line, cmd1, cmd2, infile, outfile);
+
+    		if(parseReturn == 0) break;
+
+    		switch(parseReturn){
+
+	    		case 1:
+					exec_cmd(cmd1);
+	      			break; 
+
+	    		case 2:
+	       			exec_cmd_in(cmd1, infile);
+	      			break; 
+
+	    		case 3:
+	       			exec_cmd_opt_in_append(cmd1, infile, outfile);
+	      			break; 
+
+	    		case 4:
+	       			exec_cmd_opt_in_write(cmd1, infile, outfile);
+	      			break; 
+
+	    		case 5:
+	       			exec_pipe(cmd1, cmd2);
+	      			break; 
+
+	    		case 6:
+	       			exec_pipe_in(cmd1, cmd2, infile);
+	      			break; 
+
+	    		case 7:
+	       			exec_pipe_opt_in_append(cmd1, cmd2, infile, outfile);
+	      			break; 
+
+	    		case 8:
+	       			exec_pipe_opt_in_write(cmd1, cmd2, infile, outfile);
+	      			break; 
+
+	    		default : 
+	       			printf("Not handled at this time!");//type here
+			}
+
 
     		while(cmd1[i] != NULL){
 
@@ -1068,6 +1109,11 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	//Opens the infile file and hold the file descriptor in fd
 	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 
+		// restore stdout from saved values
+	    if ( dup2(fdw, STDOUT_FILENO) == -1) {
+	        printf("It was not possible to copy the file descriptor\n");
+			exit(1); 
+	    }
 		printf("It was not possible to open the input file.\n");
 		exit(1);
 	        
