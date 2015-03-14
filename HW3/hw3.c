@@ -82,7 +82,7 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
 void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile);
 
 //Log functions
-void write_log(int file){
+void write_log_init(int file){
 
 	int aux;
 
@@ -95,7 +95,7 @@ void write_log(int file){
         //error
     };
 
-    printf("PROCESS -- PID: %d PPID: %d\n", getpid(), getppid());
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Start\n\n", getpid(), getppid());
    
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -104,6 +104,53 @@ void write_log(int file){
 
     close(aux);
 }
+
+void write_log_end(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- End\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+void write_log_wait(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call wait()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
 
 void write_log_fork(int file){
 
@@ -118,7 +165,7 @@ void write_log_fork(int file){
         //error
     };
 
-    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls fork()\n", getpid(), getppid());
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call fork()\n\n", getpid(), getppid());
    
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -141,7 +188,7 @@ void write_log_pipe(int file){
         //error
     };
 
-    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls pipe()\n", getpid(), getppid());
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call pipe()\n\n", getpid(), getppid());
    
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -164,7 +211,7 @@ void write_log_exec(int file){
         //error
     };
 
-    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls execvp()\n", getpid(), getppid());
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call execvp()\n\n", getpid(), getppid());
    
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -187,7 +234,7 @@ void write_log_exit(int file){
         //error
     };
 
-    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls exit()\n", getpid(), getppid());
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call exit()\n\n", getpid(), getppid());
    
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -197,6 +244,51 @@ void write_log_exit(int file){
     close(aux);
 }
 
+void write_log_dup(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call dup() or dup2()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+void write_log_open(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call open()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
 
 int main(int argc, char *argv[])
 {	
@@ -861,21 +953,17 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 void exec_cmd(char** cmd1){
 
 	pid_t pid;
-	
 	int foo;
 	if ( (foo = open("foo.txt", O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
         printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
 	    exit(1);
     }
-
-
-    write_log(foo);
+    write_log_init(foo);
 
 	//fork a child process
+	write_log_fork(foo);
 	pid = fork();
-
-	write_log(foo);
-	
 
 	if(pid < 0 ) { //error ocurred
 
@@ -884,19 +972,23 @@ void exec_cmd(char** cmd1){
 	}
 
 	else if(pid == 0){ //child process
-		write_log(foo);
-		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+		
+		write_log_exec(foo);
+		if(execvp(cmd1[0], cmd1) == -1 ) {
+			write_log_exit(foo);
+			exit(1);
+		}
 			
 	}
 
 	else { //parent process
 
-		write_log(foo);
+		write_log_wait(foo);
 		//parent will wait for the child to complete
 		wait(NULL);
 	}
 
-	write_log(foo);
+	write_log_end(foo);
 	close(foo);
 }
 
@@ -905,14 +997,24 @@ void exec_cmd_in(char** cmd1, char* infile){
 	pid_t pid;
 	int fd;
 
+	int foo;
+	if ( (foo = open("foo.txt", O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
+        printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
+	    exit(1);
+    }
+    write_log_init(foo);
+
 	//Input Redirection
 	//Opens the infile file and hold the file descriptor in fd
+	write_log_open(foo);
 	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 		printf("It was not possible to open the input file.\n");
 		exit(1);        
 	}
 
 	//fork a child process
+	write_log_fork(foo);
 	pid = fork();
 	if(pid < 0 ) { //error ocurred
 		fprintf(stderr, "Fork Failed");
@@ -922,21 +1024,29 @@ void exec_cmd_in(char** cmd1, char* infile){
 	else if(pid == 0){ //child process
 
 		//Makes the stdin descriptor points to infile.
+		write_log_dup(foo);
 		if ( dup2(fd, 0) == -1) {
 			printf("It was not possible to copy the file descriptor\n");
 			exit(1);
 		}
 
-		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+		write_log_exec(foo);
+		if(execvp(cmd1[0], cmd1) == -1 ) {
+			write_log_exit(foo);
+			exit(1);
+		}
 			
 	}
 	else { //parent process
 		//parent will wait for the child to complete
+		write_log_wait(foo);
 		wait(NULL);
+
 		//close the descriptors
+		write_log_end(foo);
+		close(foo);
 		close(fd);
 	}
-	
 
 }
 
