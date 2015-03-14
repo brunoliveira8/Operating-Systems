@@ -81,6 +81,7 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
 
 void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile);
 
+//Log functions
 void write_log(int file){
 
 	int aux;
@@ -94,11 +95,100 @@ void write_log(int file){
         //error
     };
 
-    printf("Hello\n");
-    printf("STDIN_FILENO VALUE = %d\n", STDIN_FILENO);
-    printf("STDOUT_FILENO VALUE = %d\n", STDOUT_FILENO);
-    printf("STDERR_FILENO VALUE = %d\n", STDERR_FILENO);
+    printf("PROCESS -- PID: %d PPID: %d\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
 
+    close(aux);
+}
+
+void write_log_fork(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls fork()\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+void write_log_pipe(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls pipe()\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+void write_log_exec(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls execvp()\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+void write_log_exit(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n\t Action -- Calls exit()\n", getpid(), getppid());
+   
     // restore output 
     if ( dup2(aux, 1) == -1 ){
         // error
@@ -783,6 +873,8 @@ void exec_cmd(char** cmd1){
 
 	//fork a child process
 	pid = fork();
+
+	write_log(foo);
 	
 
 	if(pid < 0 ) { //error ocurred
@@ -804,6 +896,7 @@ void exec_cmd(char** cmd1){
 		wait(NULL);
 	}
 
+	write_log(foo);
 	close(foo);
 }
 
