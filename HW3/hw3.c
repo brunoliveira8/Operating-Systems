@@ -1172,47 +1172,69 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 
 	pid_t pid;
 	int fd,fd1,fd2,fd3;
+	int foo;
+
+	if ( (foo = open("foo.txt", O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
+        printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
+	    exit(1);
+    }
+
+    write_log_init(foo);
 
 	//Redirections
 	//Keeps the stdout file descriptor information in fd1
+	write_log_dup(foo);
 	if ( (fd1 = dup(1)) == -1 ) {
 	    printf("It was not possible to copy the file descriptor\n");
+	    write_log_exit(foo);
 	    exit(1);
 	};
 
 	//Opens the outfile file and hold the file descriptor in fd
+	write_log_dup(foo);
 	if ( (fd = open(outfile, O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
 		printf("It was not possible to open the output file.\n");
+		write_log_exit(foo);
 		exit(1); 
 	}
 	
 	//Makes the stdout descriptor points to infile.
+	write_log_dup(foo);
 	if ( dup2(fd, 1) == -1) {
 	    printf("It was not possible to copy the file descriptor\n");
+	    write_log_exit(foo);
 		exit(1);
 	}
 
 
 	//Verifies if there is an infile, then repeats the output command but for the input
 	if(infile[0] != '\0'){
+		write_log_dup(foo);
 		if ( (fd3 = dup(0)) == -1 ) {
 		    printf("It was not possible to copy the file descriptor\n");
+		    write_log_exit(foo);
 	    	exit(1);
 		}
 
+		write_log_dup(foo);
 		if ( (fd2 = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 			printf("It was not possible to open the input file.\n");
+			write_log_exit(foo);
 			exit(1);    
 		}
 
+		write_log_dup(foo);
 		if ( dup2(fd2, 0) == -1) {
 		    printf("It was not possible to copy the file descriptor\n");
+		    write_log_exit(foo);
 			exit(1);
 		}
 	}
 
 
 	//fork a child process
+	write_log_fork(foo);
 	pid = fork();
 
 	if(pid < 0 ) { //error ocurred
@@ -1223,27 +1245,35 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 
 	else if(pid == 0){ //child process
 		
-		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+		write_log_exec(foo);
+		if(execvp(cmd1[0], cmd1) == -1 ) {
+			write_log_exit(foo);
+			exit(1);
+		}
 			
 	}
 
 	else { //parent process
 
 		//parent will wait for the child to complete
+		write_log_wait(foo);
 		wait(NULL);
 	}
 
 	// restore, output goes to stdout
+	write_log_dup(foo);
 	if ( dup2(fd1, 1) == -1 ){
 	    // error
 	};
 
 	// restore, input goes to stdout
+	write_log_dup(foo);
 	if ( dup2(fd3, 0) == -1 ){
 	    // error
 	};
 
 	//Close the descriptors
+	write_log_end(foo);
 	close(fd);
 	close(fd1);
 	
