@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
 	char outfile[CSTRSIZE];
 	int i = 0;
 	int parseReturn = 0;
+	int foo;
 
 	cmd1[0]=NULL;
     cmd2[0]=NULL;
@@ -123,6 +124,15 @@ int main(int argc, char *argv[])
 	outfile[0] = '\0';
 
     printf("MyShell 2.0v by Tarcisio Oliveira\n");
+
+    //Opens the foo.txt and erase the information.
+	if ( (foo = open("foo.txt", O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
+		printf("It was not possible to open the output file.\n");
+		exit(1); 
+	}
+
+	close(foo);
+	
 
 
     if(argc == 2){
@@ -766,7 +776,7 @@ void exec_cmd(char** cmd1){
         printf("It was not possible to copy the file descriptor\n");
 	    exit(1);
     }
-    
+
 
     write_log(foo);
 
@@ -791,7 +801,7 @@ void exec_cmd(char** cmd1){
 		wait(NULL);
 	}
 
-	close(fd);
+	close(foo);
 }
 
 void exec_cmd_in(char** cmd1, char* infile){
