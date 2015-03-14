@@ -1276,6 +1276,7 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	write_log_end(foo);
 	close(fd);
 	close(fd1);
+	close(foo);
 	
 	if(infile[0] != '\0'){
 		close(fd2);
@@ -1421,6 +1422,7 @@ void exec_pipe(char** cmd1, char** cmd2){
     close(fdw);
     close(fdr);
     close(pipefd[0]);
+    close(foo);
 }
 
 
@@ -1431,10 +1433,21 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	int pipefd[2]; // return value from the pipe system call
     int fdw, fdr;
     int fd;
+    int foo;
+
+	if ( (foo = open("foo.txt", O_RDWR | O_CREAT | O_APPEND,  S_IRUSR | S_IWUSR)) == -1 ){
+        printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
+	    exit(1);
+    }
+
+    write_log_init(foo);
 
     // making a pipe
+    write_log_pipe(foo);
     if ( pipe(pipefd) == -1 ) {
         printf("It was not possible to create the pipe\n");
+        write_log_exit(foo);
 		exit(1);
     }
     // pipe[1] is the write end of the pipe
@@ -1442,28 +1455,35 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 
     // save a copy of stdout in entry fdw
     // you may want to check the fdw value
+    write_log_dup(foo);
     fdw=dup(STDOUT_FILENO);
     if (fdw == -1){
+    	write_log_exit(foo);
     	printf("It was not possible to copy the file descriptor\n");
 		exit(1);      
     }
 
     // changing descriptor table, making write end of pipe as stdout
+    write_log_dup(foo);
     if ( dup2(pipefd[1], STDOUT_FILENO) == -1) {
+    	write_log_exit(foo);
         printf("It was not possible to copy the file descriptor\n");
 		exit(1);  
     }
 
 
 	//Opens the infile file and hold the file descriptor in fd
+	write_log_dup(foo);
 	if ( (fd = open(infile, O_RDONLY,  S_IRUSR | S_IWUSR)) == -1 ){
 
 		printf("It was not possible to open the input file.\n");
+		write_log_exit(foo);
 		exit(1);
 	        
 	}
 
 	//fork a child process
+	write_log_fork(foo);
 	pid = fork();
 
 
@@ -1476,40 +1496,53 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	else if(pid == 0){ //child process
 
 		//Makes the stdin descriptor points to infile.
+		write_log_dup(foo);
 		if ( dup2(fd, 0) == -1) {
 			printf("It was not possible to copy the file descriptor\n");
+			write_log_exit(foo);
 			exit(1);
 		}
 
-		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
+		write_log_exec(foo);
+		if(execvp(cmd1[0], cmd1) == -1 ) {
+			write_log_exit(foo);
+			exit(1);
+		}
 			
 	}
 
 	else { //parent process
 
 		//parent will wait for the child to complete
+		write_log_wait(foo);
 		wait(NULL);
 	}
 
 	// restore stdout from saved values
+	write_log_dup(foo);
     if ( dup2(fdw, STDOUT_FILENO) == -1) {
         printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
 		exit(1); 
     }
 
  
 	// save a copy of stdin in entry fdr
     // you may want to check the fdr value
+    write_log_dup(foo);
     fdr=dup(STDIN_FILENO);
     if (fdr == -1){
         printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
 		exit(1); 
     }
 
     
     // make read end of pipe as stdin
+    write_log_dup(foo);
     if ( dup2(pipefd[0], STDIN_FILENO ) == -1) {
         printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
 		exit(1); 
     }
 
@@ -1517,6 +1550,7 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	close(pipefd[1]);
 
 	//fork a child process
+	write_log_fork(foo);
 	pid = fork();
 
 	if(pid < 0 ) { //error ocurred
@@ -1526,25 +1560,35 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 	}
 
 	else if(pid == 0){ //child process
-		if(execvp(cmd2[0], cmd2) == -1 ) exit(1);
+
+		write_log_exec(foo);
+		if(execvp(cmd2[0], cmd2) == -1 ) {
+			write_log_exit(foo);
+			exit(1);
+		}
 	}
 
 	else { //parent process
 		//parent will wait for the child to complete
+		write_log_wait(foo);
 		wait(NULL);
 	}
 
 	// restore stdin and stdout from saved values
+	write_log_dup(foo);
     if ( dup2(fdr, STDIN_FILENO) == -1) {
         printf("It was not possible to copy the file descriptor\n");
+        write_log_exit(foo);
 		exit(1); 
     }
 
 	// closing up
+	write_log_end(foo);
     close(fdw);
     close(fdr);
     close(pipefd[0]);
     close(fd);
+    close(foo);
 
 }
 
