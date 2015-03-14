@@ -1,57 +1,45 @@
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Start
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call pipe()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
- Action -- Call open()
-
-PROCESS -- PID: 88446 PPID: 84645
- Action -- Call open()
-
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call fork()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call wait()
 
-PROCESS -- PID: 88447 PPID: 88446
- Action -- Call dup() or dup2()
-
-PROCESS -- PID: 88447 PPID: 88446
+PROCESS -- PID: 90349 PPID: 90348
  Action -- Call execvp()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call fork()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call wait()
 
-PROCESS -- PID: 88448 PPID: 88446
- Action -- Call dup() or dup2()
-
-PROCESS -- PID: 88448 PPID: 88446
+PROCESS -- PID: 90350 PPID: 90348
  Action -- Call execvp()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- Call dup() or dup2()
 
-PROCESS -- PID: 88446 PPID: 84645
+PROCESS -- PID: 90348 PPID: 84645
  Action -- End
 

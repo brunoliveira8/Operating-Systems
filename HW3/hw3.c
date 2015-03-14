@@ -47,6 +47,7 @@
  #define CSTRSIZE 100
 
 
+//GENERAL FUNCTIONS
 int hasPipe(char *line);
 
 void getCommand(char *line, char **cmd);
@@ -63,8 +64,7 @@ void splitPipeCommand(char *line, char *cmd1, char *cmd2);
 
 int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outfile);
 
-//Execution functions
-
+//EXECUTION FUNCTIONS
 void exec_cmd(char** cmd1);
 
 void exec_cmd_in(char** cmd1, char* infile);
@@ -81,214 +81,25 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
 
 void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile);
 
-//Log functions
-void write_log_init(int file){
+//LOG FUNCTIONS
+void write_log_init(int file);
 
-	int aux;
+void write_log_end(int file);
 
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
+void write_log_wait(int file);
 
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
+void write_log_fork(int file);
 
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Start\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
+void write_log_pipe(int file);
 
-    close(aux);
-}
+void write_log_exec(int file);
 
-void write_log_end(int file){
+void write_log_exit(int file);
 
-	int aux;
+void write_log_dup(int file);
 
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
+void write_log_open(int file);
 
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- End\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_wait(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call wait()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-
-void write_log_fork(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call fork()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_pipe(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call pipe()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_exec(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call execvp()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_exit(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call exit()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_dup(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call dup() or dup2()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
-
-void write_log_open(int file){
-
-	int aux;
-
-	//save output in aux
-	if ( (aux = dup(1)) == -1 ) {
-        // error
-    };
-
-    if ( dup2(file, 1) == -1) {
-        //error
-    };
-
-    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call open()\n\n", getpid(), getppid());
-   
-    // restore output 
-    if ( dup2(aux, 1) == -1 ){
-        // error
-    };
-
-    close(aux);
-}
 
 int main(int argc, char *argv[])
 {	
@@ -950,6 +761,17 @@ int parse_command(char* line, char** cmd1, char** cmd2, char* infile, char* outf
 
 //Execution functions
 
+ /*-----------------------exec_cmd--------------------------------------
+     |  Function exec_cmd
+	 |
+	 |  Purpose:  Executes a simple command
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - Command to be executed
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_cmd(char** cmd1){
 
 	pid_t pid;
@@ -992,6 +814,18 @@ void exec_cmd(char** cmd1){
 	close(foo);
 }
 
+ /*-----------------------exec_cmd_in--------------------------------------
+     |  Function exec_cmd_in
+	 |
+	 |  Purpose:  Executes a simple command with input redirection
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - Command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_cmd_in(char** cmd1, char* infile){
 
 	pid_t pid;
@@ -1052,6 +886,21 @@ void exec_cmd_in(char** cmd1, char* infile){
 	}
 
 }
+
+ /*-----------------------exec_cmd_in_append--------------------------------------
+     |  Function exec_cmd_append
+	 |
+	 |  Purpose:  Executes a simple command with append output redirection and 
+	 |		possible input redirection. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - Command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |  outfile (IN) - File used for the output redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 
 void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 	pid_t pid;
@@ -1167,7 +1016,20 @@ void exec_cmd_opt_in_append(char** cmd1, char* infile, char* outfile){
 
 
 }
-
+/*-----------------------exec_cmd_in_write--------------------------------------
+     |  Function exec_cmd_write
+	 |
+	 |  Purpose:  Executes a simple command with overwrite output redirection and 
+	 |		possible input redirection. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - Command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |  outfile (IN) - File used for the output redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 
 	pid_t pid;
@@ -1284,7 +1146,18 @@ void exec_cmd_opt_in_write(char** cmd1, char* infile, char* outfile){
 	}
 }
 
-
+/*-----------------------exec_pipe--------------------------------------
+     |  Function exec_pipe
+	 |
+	 |  Purpose:  Executes two commands with pipe. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - First command to be executed
+	 |  cmd2 (IN) - Second command to be executed
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_pipe(char** cmd1, char** cmd2){
 
 	pid_t pid;
@@ -1426,7 +1299,19 @@ void exec_pipe(char** cmd1, char** cmd2){
 }
 
 
-
+/*-----------------------exec_pipe_in--------------------------------------
+     |  Function exec_pipe_in
+	 |
+	 |  Purpose:  Executes two commands with pipe and input redirection. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - First command to be executed
+	 |  cmd2 (IN) - Second command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
 
 	pid_t pid;
@@ -1591,7 +1476,21 @@ void exec_pipe_in(char** cmd1, char** cmd2, char* infile){
     close(foo);
 
 }
-
+/*-----------------------exec_pipe_opt_in_append--------------------------------------
+     |  Function exec_pipe_opt_in_append
+	 |
+	 |  Purpose:  Executes two commands with pipe, append output redirection and possible
+	 |		input redirection. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - First command to be executed
+	 |  cmd2 (IN) - Second command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |  outfile (IN) - File used for the output redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile){
 	
 	pid_t pid;
@@ -1786,6 +1685,21 @@ void exec_pipe_opt_in_append(char** cmd1,char** cmd2,char* infile,char* outfile)
 
 }
 
+/*-----------------------exec_pipe_opt_in_write--------------------------------------
+     |  Function exec_pipe_opt_in_write
+	 |
+	 |  Purpose:  Executes two commands with pipe, overwrite output redirection 
+	 | 		and possible input redirection. 
+	 |
+	 |  Parameters:
+	 |  cmd1 (IN) - First command to be executed
+	 |  cmd2 (IN) - Second command to be executed
+	 |  infile (IN) - File used for the input redirection
+	 |  outfile (IN) - File used for the output redirection
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
 void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){
 	pid_t pid;
 	int pipefd[2]; // return value from the pipe system call
@@ -1972,6 +1886,314 @@ void exec_pipe_opt_in_write(char** cmd1,char** cmd2,char* infile,char* outfile){
 
 }
 
+//Log functions
+
+/*-----------------------write_log_init--------------------------------------
+     |  Function write_log_init
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_init(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Start\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_end--------------------------------------
+     |  Function write_log_end
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_end(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- End\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_wait--------------------------------------
+     |  Function write_log_wait
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_wait(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call wait()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_fork--------------------------------------
+     |  Function write_log_fork
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_fork(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call fork()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+
+/*-----------------------write_log_pipe--------------------------------------
+     |  Function write_log_pipe
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_pipe(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call pipe()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_exec--------------------------------------
+     |  Function write_log_exec
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_exec(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call execvp()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_exit--------------------------------------
+     |  Function write_log_exit
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_exit(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call exit()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_dup--------------------------------------
+     |  Function write_log_dup
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_dup(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call dup() or dup2()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
+
+/*-----------------------write_log_open--------------------------------------
+     |  Function write_log_open
+	 |
+	 |  Purpose:  Writes a message in a file
+	 |
+	 |  Parameters:
+	 |  file (IN) - File where the log message will be written
+	 |
+	 |  Returns:  Nothing.  (This is a void function.)
+	 |
+	 *-------------------------------------------------------------------*/
+void write_log_open(int file){
+
+	int aux;
+
+	//save output in aux
+	if ( (aux = dup(1)) == -1 ) {
+        // error
+    };
+
+    if ( dup2(file, 1) == -1) {
+        //error
+    };
+
+    printf("PROCESS -- PID: %d PPID: %d\n Action -- Call open()\n\n", getpid(), getppid());
+   
+    // restore output 
+    if ( dup2(aux, 1) == -1 ){
+        // error
+    };
+
+    close(aux);
+}
 
 
   
