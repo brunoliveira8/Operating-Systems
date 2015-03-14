@@ -95,6 +95,9 @@ void write_log(int file){
     };
 
     printf("Hello\n");
+    printf("STDIN_FILENO VALUE = %d\n", STDIN_FILENO);
+    printf("STDOUT_FILENO VALUE = %d\n", STDOUT_FILENO);
+    printf("STDERR_FILENO VALUE = %d\n", STDERR_FILENO);
 
     // restore output 
     if ( dup2(aux, 1) == -1 ){
@@ -102,7 +105,6 @@ void write_log(int file){
     };
 
     close(aux);
-    close(file);
 }
 
 
@@ -125,15 +127,14 @@ int main(int argc, char *argv[])
 
     printf("MyShell 2.0v by Tarcisio Oliveira\n");
 
-    //Opens the foo.txt and erase the information.
+    //Opens the outfile file and hold the file descriptor in fd
 	if ( (foo = open("foo.txt", O_WRONLY | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR)) == -1 ){
-		printf("It was not possible to open the output file.\n");
+		printf("It was not possible to open the foo.txt file.\n");
 		exit(1); 
 	}
 
 	close(foo);
 	
-
 
     if(argc == 2){
 
@@ -782,6 +783,7 @@ void exec_cmd(char** cmd1){
 
 	//fork a child process
 	pid = fork();
+	
 
 	if(pid < 0 ) { //error ocurred
 
@@ -790,13 +792,14 @@ void exec_cmd(char** cmd1){
 	}
 
 	else if(pid == 0){ //child process
-
+		write_log(foo);
 		if(execvp(cmd1[0], cmd1) == -1 ) exit(1);
 			
 	}
 
 	else { //parent process
 
+		write_log(foo);
 		//parent will wait for the child to complete
 		wait(NULL);
 	}
