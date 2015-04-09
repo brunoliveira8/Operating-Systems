@@ -3,13 +3,13 @@
  |
  |       Author:  Tarcisio Bruno Carneiro Oliveira
  |     Language:  ANSI C (tested using gcc on turing [might list version infor])
- |   To Compile:  gcc -Wall hw1.c
+ |   To Compile:  gcc -Wall hw3.c
  |
  |        Class:  CSCE3613 
  |      Project:  Simple Shell Part III
  |   Assumption:  [any prerequisite or precondition that must be met]
- | Date Created:  1-23-2015
- |     Modified:  2-4-2015
+ | Date Created:  3-4-2015
+ |     Modified:  3-15-2015
  |
  +-----------------------------------------------------------------------------
  |
